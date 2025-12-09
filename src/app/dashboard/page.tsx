@@ -3,6 +3,16 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
+
+const TripMap = dynamic(() => import('@/components/map/TripMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[500px] bg-gray-100 rounded-lg flex items-center justify-center">
+      <div className="text-gray-500">Loading map...</div>
+    </div>
+  ),
+})
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
@@ -77,6 +87,8 @@ export default function DashboardPage() {
   ])
   const [editingTrip, setEditingTrip] = useState<number | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
+  const [useMapSelection, setUseMapSelection] = useState(false)
+  const [selectedMapLocations, setSelectedMapLocations] = useState<any[]>([])
 
   const stats = [
     {
@@ -576,36 +588,60 @@ export default function DashboardPage() {
                 <div className="max-w-5xl mx-auto space-y-4">
                   {/* Booking Form */}
                   <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Rental Details</h2>
-                    <form className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Pickup Location
-                          </label>
-                          <select className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
-                            <option value="">Select location</option>
-                            <option value="downtown-la">Downtown LA</option>
-                            <option value="airport-lax">LAX Airport</option>
-                            <option value="santa-monica">Santa Monica</option>
-                            <option value="beverly-hills">Beverly Hills</option>
-                            <option value="hollywood">Hollywood</option>
-                          </select>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-bold text-gray-900">Rental Details</h2>
+                      <button
+                        type="button"
+                        onClick={() => setUseMapSelection(!useMapSelection)}
+                        className={`px-4 py-2 rounded-md font-medium transition-all ${
+                          useMapSelection
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                          {useMapSelection ? 'Use Dropdown' : 'Use Map'}
+                        </span>
+                      </button>
+                    </div>
+
+                    {useMapSelection ? (
+                      <TripMap onLocationsChange={setSelectedMapLocations} />
+                    ) : (
+                      <form className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Pickup Location
+                            </label>
+                            <select className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
+                              <option value="">Select location</option>
+                              <option value="colombo">Colombo</option>
+                              <option value="kandy">Kandy</option>
+                              <option value="galle">Galle</option>
+                              <option value="jaffna">Jaffna</option>
+                              <option value="negombo">Negombo</option>
+                              <option value="anuradhapura">Anuradhapura</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Return Location
+                            </label>
+                            <select className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
+                              <option value="">Select location</option>
+                              <option value="colombo">Colombo</option>
+                              <option value="kandy">Kandy</option>
+                              <option value="galle">Galle</option>
+                              <option value="jaffna">Jaffna</option>
+                              <option value="negombo">Negombo</option>
+                              <option value="anuradhapura">Anuradhapura</option>
+                            </select>
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Return Location
-                          </label>
-                          <select className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
-                            <option value="">Select location</option>
-                            <option value="downtown-la">Downtown LA</option>
-                            <option value="airport-lax">LAX Airport</option>
-                            <option value="santa-monica">Santa Monica</option>
-                            <option value="beverly-hills">Beverly Hills</option>
-                            <option value="hollywood">Hollywood</option>
-                          </select>
-                        </div>
-                      </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -649,6 +685,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </form>
+                    )}
                   </div>
 
                   {/* Vehicle Selection */}
