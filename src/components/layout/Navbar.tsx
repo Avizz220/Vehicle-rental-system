@@ -42,30 +42,33 @@ export const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
-            <Link
-              href="/vehicles"
+            <button
+              onClick={() => {
+                const vehiclesSection = document.getElementById('vehicles-section')
+                vehiclesSection?.scrollIntoView({ behavior: 'smooth' })
+              }}
               className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
             >
               Vehicles
-            </Link>
-            <Link
-              href="/locations"
+            </button>
+            <button
+              onClick={() => {
+                const feedbacksSection = document.getElementById('feedbacks-section')
+                feedbacksSection?.scrollIntoView({ behavior: 'smooth' })
+              }}
               className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
             >
-              Locations
-            </Link>
-            <Link
-              href="/about"
-              className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
+              Feedbacks
+            </button>
+            <button
+              onClick={() => {
+                const contactSection = document.getElementById('contact-section')
+                contactSection?.scrollIntoView({ behavior: 'smooth' })
+              }}
               className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
             >
               Contact
-            </Link>
+            </button>
           </div>
 
           {/* Auth Buttons */}
