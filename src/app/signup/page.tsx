@@ -46,7 +46,7 @@ export default function SignUpPage() {
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
+          className="w-full max-w-xl"
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 mb-8">

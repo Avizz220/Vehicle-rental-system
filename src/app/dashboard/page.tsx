@@ -8,6 +8,75 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [trips, setTrips] = useState([
+    {
+      id: 1,
+      vehicle: 'Tesla Model 3',
+      category: 'Electric',
+      image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400&q=80',
+      pickupDate: '2025-11-15',
+      returnDate: '2025-11-18',
+      pickupLocation: 'Downtown LA',
+      returnLocation: 'Downtown LA',
+      status: 'completed',
+      price: 285,
+      features: ['Auto', 'Electric', 'GPS', 'Insurance'],
+    },
+    {
+      id: 2,
+      vehicle: 'BMW X5',
+      category: 'SUV',
+      image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&q=80',
+      pickupDate: '2025-12-15',
+      returnDate: '2025-12-18',
+      pickupLocation: 'Airport Terminal',
+      returnLocation: 'Airport Terminal',
+      status: 'active',
+      price: 450,
+      features: ['7 Seats', 'Auto', 'Premium', '4WD'],
+    },
+    {
+      id: 3,
+      vehicle: 'Honda CR-V',
+      category: 'SUV',
+      image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=400&q=80',
+      pickupDate: '2025-12-22',
+      returnDate: '2025-12-27',
+      pickupLocation: 'Santa Monica',
+      returnLocation: 'Beverly Hills',
+      status: 'upcoming',
+      price: 325,
+      features: ['5 Seats', 'Auto', 'AC', 'Bluetooth'],
+    },
+    {
+      id: 4,
+      vehicle: 'Toyota Camry',
+      category: 'Economy',
+      image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&q=80',
+      pickupDate: '2025-10-05',
+      returnDate: '2025-10-08',
+      pickupLocation: 'Hollywood',
+      returnLocation: 'Hollywood',
+      status: 'completed',
+      price: 210,
+      features: ['5 Seats', 'Auto', 'AC', 'Bluetooth'],
+    },
+    {
+      id: 5,
+      vehicle: 'Mercedes-Benz C-Class',
+      category: 'Luxury',
+      image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400&q=80',
+      pickupDate: '2025-11-01',
+      returnDate: '2025-11-03',
+      pickupLocation: 'Beverly Hills',
+      returnLocation: 'Downtown LA',
+      status: 'cancelled',
+      price: 267,
+      features: ['5 Seats', 'Auto', 'Premium', 'GPS'],
+    },
+  ])
+  const [editingTrip, setEditingTrip] = useState<number | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null)
 
   const stats = [
     {
@@ -514,7 +583,7 @@ export default function DashboardPage() {
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Pickup Location
                           </label>
-                          <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
+                          <select className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
                             <option value="">Select location</option>
                             <option value="downtown-la">Downtown LA</option>
                             <option value="airport-lax">LAX Airport</option>
@@ -527,7 +596,7 @@ export default function DashboardPage() {
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             Return Location
                           </label>
-                          <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
+                          <select className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent">
                             <option value="">Select location</option>
                             <option value="downtown-la">Downtown LA</option>
                             <option value="airport-lax">LAX Airport</option>
@@ -545,7 +614,7 @@ export default function DashboardPage() {
                           </label>
                           <input
                             type="date"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                           />
                         </div>
                         <div>
@@ -554,7 +623,7 @@ export default function DashboardPage() {
                           </label>
                           <input
                             type="time"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                           />
                         </div>
                       </div>
@@ -566,7 +635,7 @@ export default function DashboardPage() {
                           </label>
                           <input
                             type="date"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                           />
                         </div>
                         <div>
@@ -575,7 +644,7 @@ export default function DashboardPage() {
                           </label>
                           <input
                             type="time"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                           />
                         </div>
                       </div>
@@ -724,10 +793,291 @@ export default function DashboardPage() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="bg-white rounded-xl shadow-lg p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">My Trips</h2>
-                  <p className="text-gray-600">Your trip history will appear here.</p>
+                <div className="max-w-6xl mx-auto">
+                  {/* Filter Tabs */}
+                  <div className="bg-white rounded-lg shadow-sm p-5 border border-gray-100 mb-4">
+                    <div className="flex gap-3">
+                      {['all', 'active', 'upcoming', 'completed', 'cancelled'].map((filter) => (
+                        <button
+                          key={filter}
+                          className={`px-4 py-2 rounded-md font-medium transition-all ${
+                            filter === 'all'
+                              ? 'bg-gray-900 text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Trips Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {trips.map((trip) => (
+                      <div
+                        key={trip.id}
+                        className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all"
+                      >
+                        {/* Vehicle Image */}
+                        <div className="relative h-48 w-full overflow-hidden bg-gray-100">
+                          <img
+                            src={trip.image}
+                            alt={trip.vehicle}
+                            className="w-full h-full object-cover"
+                          />
+                          <span
+                            className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${
+                              trip.status === 'completed'
+                                ? 'bg-green-100 text-green-700'
+                                : trip.status === 'active'
+                                ? 'bg-blue-100 text-blue-700'
+                                : trip.status === 'upcoming'
+                                ? 'bg-purple-100 text-purple-700'
+                                : 'bg-red-100 text-red-700'
+                            }`}
+                          >
+                            {trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}
+                          </span>
+                        </div>
+
+                        {/* Trip Details */}
+                        <div className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <h3 className="font-bold text-lg text-gray-900">{trip.vehicle}</h3>
+                              <p className="text-sm text-gray-600">{trip.category}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-2xl font-bold text-gray-900">${trip.price}</p>
+                              <p className="text-xs text-gray-500">Total cost</p>
+                            </div>
+                          </div>
+
+                          {/* Trip Info */}
+                          <div className="space-y-2 mb-3">
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <span>{trip.pickupDate} to {trip.returnDate}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                              </svg>
+                              <span>{trip.pickupLocation} → {trip.returnLocation}</span>
+                            </div>
+                          </div>
+
+                          {/* Features */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {trip.features.map((feature) => (
+                              <span
+                                key={feature}
+                                className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                              >
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex gap-2 pt-3 border-t border-gray-100">
+                            {(trip.status === 'upcoming' || trip.status === 'active') && (
+                              <>
+                                <button
+                                  onClick={() => setEditingTrip(trip.id)}
+                                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                                >
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                  <span className="text-sm font-medium">Edit</span>
+                                </button>
+                                <button
+                                  onClick={() => setDeleteConfirm(trip.id)}
+                                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-red-600 border border-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                >
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                  <span className="text-sm font-medium">Cancel</span>
+                                </button>
+                              </>
+                            )}
+                            <button
+                              className={`${(trip.status === 'upcoming' || trip.status === 'active') ? 'flex-1' : 'w-full'} px-3 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors`}
+                            >
+                              View Details
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Edit Trip Modal */}
+                <AnimatePresence>
+                  {editingTrip && (
+                    <>
+                      <div
+                        className="fixed inset-0 bg-black bg-opacity-50 z-50"
+                        onClick={() => setEditingTrip(null)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                      >
+                        <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                          <div className="sticky top-0 bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
+                            <h3 className="text-xl font-bold">Edit Trip</h3>
+                            <button
+                              onClick={() => setEditingTrip(null)}
+                              className="text-gray-300 hover:text-white"
+                            >
+                              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="p-6">
+                            <form className="space-y-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Pickup Date
+                                  </label>
+                                  <input
+                                    type="date"
+                                    defaultValue={trips.find(t => t.id === editingTrip)?.pickupDate}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Return Date
+                                  </label>
+                                  <input
+                                    type="date"
+                                    defaultValue={trips.find(t => t.id === editingTrip)?.returnDate}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Pickup Location
+                                </label>
+                                <select
+                                  defaultValue={trips.find(t => t.id === editingTrip)?.pickupLocation}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                                >
+                                  <option value="Downtown LA">Downtown LA</option>
+                                  <option value="Airport Terminal">Airport Terminal</option>
+                                  <option value="Santa Monica">Santa Monica</option>
+                                  <option value="Beverly Hills">Beverly Hills</option>
+                                  <option value="Hollywood">Hollywood</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Return Location
+                                </label>
+                                <select
+                                  defaultValue={trips.find(t => t.id === editingTrip)?.returnLocation}
+                                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+                                >
+                                  <option value="Downtown LA">Downtown LA</option>
+                                  <option value="Airport Terminal">Airport Terminal</option>
+                                  <option value="Santa Monica">Santa Monica</option>
+                                  <option value="Beverly Hills">Beverly Hills</option>
+                                  <option value="Hollywood">Hollywood</option>
+                                </select>
+                              </div>
+                              <div className="flex gap-3 pt-4">
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingTrip(null)}
+                                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="submit"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    setEditingTrip(null)
+                                  }}
+                                  className="flex-1 px-4 py-3 bg-gray-900 text-white rounded-md font-medium hover:bg-gray-800 transition-colors"
+                                >
+                                  Save Changes
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+
+                {/* Delete Confirmation Modal */}
+                <AnimatePresence>
+                  {deleteConfirm && (
+                    <>
+                      <div
+                        className="fixed inset-0 bg-black bg-opacity-50 z-50"
+                        onClick={() => setDeleteConfirm(null)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                      >
+                        <div className="bg-white rounded-lg shadow-2xl max-w-md w-full">
+                          <div className="p-6">
+                            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                              <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+                              Cancel Trip?
+                            </h3>
+                            <p className="text-gray-600 text-center mb-6">
+                              Are you sure you want to cancel this trip? This action cannot be undone and cancellation fees may apply.
+                            </p>
+                            <div className="flex gap-3">
+                              <button
+                                onClick={() => setDeleteConfirm(null)}
+                                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-50 transition-colors"
+                              >
+                                Keep Trip
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setTrips(trips.filter(t => t.id !== deleteConfirm))
+                                  setDeleteConfirm(null)
+                                }}
+                                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-md font-medium hover:bg-red-700 transition-colors"
+                              >
+                                Cancel Trip
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )}
 
@@ -828,35 +1178,35 @@ export default function DashboardPage() {
                   <form className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           First Name
                         </label>
                         <input
                           type="text"
                           defaultValue="John"
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                           Last Name
                         </label>
                         <input
                           type="text"
                           defaultValue="Doe"
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Email Address
                       </label>
                       <input
                         type="email"
                         defaultValue="john.doe@example.com"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                     </div>
 
@@ -867,29 +1217,29 @@ export default function DashboardPage() {
                       <input
                         type="tel"
                         defaultValue="+1 (555) 123-4567"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Date of Birth
                       </label>
                       <input
                         type="date"
                         defaultValue="1990-01-01"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Address
                       </label>
                       <textarea
                         rows={2}
                         defaultValue="123 Main Street, Apt 4B"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                     </div>
 
@@ -909,24 +1259,24 @@ export default function DashboardPage() {
                   <h2 className="text-lg font-bold text-gray-900 mb-4">Change Password</h2>
                   <form className="space-y-4">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Current Password
                       </label>
                       <input
                         type="password"
                         placeholder="Enter current password"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         New Password
                       </label>
                       <input
                         type="password"
                         placeholder="Enter new password"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                       <p className="mt-1 text-xs text-gray-500">
                         Min 8 characters with uppercase, lowercase, number and special character.
@@ -934,13 +1284,13 @@ export default function DashboardPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
                         Confirm New Password
                       </label>
                       <input
                         type="password"
                         placeholder="Confirm new password"
-                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       />
                     </div>
 
