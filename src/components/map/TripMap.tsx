@@ -1,9 +1,27 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents } from 'react-leaflet'
+import { useEffect, useState, useRef } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMapEvents, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+
+// OpenStreetMap Nominatim search function
+const searchLocation = async (query: string) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)},Sri Lanka&limit=5&addressdetails=1`
+    )
+    const data = await response.json()
+    return data.map((item: any) => ({
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon),
+      label: item.display_name,
+    }))
+  } catch (error) {
+    console.error('Search error:', error)
+    return []
+  }
+}
 
 // Fix for default marker icons in Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -76,6 +94,15 @@ function MapClickHandler({ onMapClick }: { onMapClick: (lat: number, lng: number
   return null
 }
 
+// Component to fly to location
+function FlyToLocation({ lat, lng }: { lat: number; lng: number }) {
+  const map = useMap()
+  useEffect(() => {
+    map.flyTo([lat, lng], 13, { duration: 1.5 })
+  }, [lat, lng, map])
+  return null
+}
+
 export default function TripMap({ onLocationsChange }: TripMapProps) {
   const [mounted, setMounted] = useState(false)
   const [locations, setLocations] = useState<Location[]>([])
@@ -83,6 +110,12 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
   const [showLocationPrompt, setShowLocationPrompt] = useState(false)
   const [gettingLocation, setGettingLocation] = useState(false)
   const [locationError, setLocationError] = useState<string | null>(null)
+  const [showSearchBar, setShowSearchBar] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searching, setSearching] = useState(false)
+  const [flyToCoords, setFlyToCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Sri Lanka center coordinates
   const sriLankaCenter: [number, number] = [7.8731, 80.7718]
@@ -96,6 +129,31 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
       onLocationsChange(locations)
     }
   }, [locations, onLocationsChange])
+
+  // Debounced search
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([])
+      return
+    }
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    setSearching(true)
+    searchTimeoutRef.current = setTimeout(async () => {
+      const results = await searchLocation(searchQuery)
+      setSearchResults(results)
+      setSearching(false)
+    }, 500)
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
+  }, [searchQuery])
 
   const getCurrentLocation = () => {
     setGettingLocation(true)
@@ -152,7 +210,53 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
 
   const handleManualSelection = () => {
     setShowLocationPrompt(false)
+    setShowSearchBar(false)
     setMapMode('start')
+  }
+
+  const handleSearchSelection = () => {
+    setShowLocationPrompt(false)
+    setShowSearchBar(true)
+    setSearchQuery('')
+    setSearchResults([])
+  }
+
+  const handleSetEndClick = () => {
+    setMapMode('end')
+    setShowSearchBar(true)
+    setSearchQuery('')
+    setSearchResults([])
+  }
+
+  const handleAddWaypointClick = () => {
+    setMapMode('waypoint')
+    setShowSearchBar(true)
+    setSearchQuery('')
+    setSearchResults([])
+  }
+
+  const handleSearchResultSelect = (result: any) => {
+    const newLocation: Location = {
+      lat: result.lat,
+      lng: result.lng,
+      label: result.label,
+      type: mapMode,
+    }
+
+    if (mapMode === 'start') {
+      setLocations([newLocation, ...locations.filter(l => l.type !== 'start')])
+      setMapMode('end')
+    } else if (mapMode === 'end') {
+      setLocations([...locations.filter(l => l.type !== 'end'), newLocation])
+      setMapMode('waypoint')
+    } else {
+      setLocations([...locations, newLocation])
+    }
+
+    setFlyToCoords({ lat: result.lat, lng: result.lng })
+    setShowSearchBar(false)
+    setSearchQuery('')
+    setSearchResults([])
   }
 
   const handleMapClick = (lat: number, lng: number) => {
@@ -240,7 +344,7 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
           </button>
           <button
             type="button"
-            onClick={() => setMapMode('end')}
+            onClick={handleSetEndClick}
             className={`flex-1 px-3 py-2 rounded-md font-medium transition-colors ${
               mapMode === 'end'
                 ? 'bg-red-500 text-white'
@@ -254,7 +358,7 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
           </button>
           <button
             type="button"
-            onClick={() => setMapMode('waypoint')}
+            onClick={handleAddWaypointClick}
             className={`flex-1 px-3 py-2 rounded-md font-medium transition-colors ${
               mapMode === 'waypoint'
                 ? 'bg-blue-500 text-white'
@@ -273,6 +377,93 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
         </p>
       </div>
 
+      {/* Search Bar */}
+      {showSearchBar && (
+        <div className="bg-white rounded-lg p-4 border-2 border-blue-500 shadow-lg">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-gray-900">
+              Search {mapMode === 'start' ? 'Starting' : mapMode === 'end' ? 'Ending' : 'Waypoint'} Location
+            </h3>
+            <button
+              onClick={() => setShowSearchBar(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for any city, town, or village in Sri Lanka..."
+              className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              autoFocus
+            />
+            <svg
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          {searching && (
+            <div className="mt-3 text-center text-sm text-gray-500">
+              Searching...
+            </div>
+          )}
+
+          {searchResults.length > 0 && (
+            <div className="mt-3 max-h-64 overflow-y-auto space-y-2">
+              {searchResults.map((result, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSearchResultSelect(result)}
+                  className="w-full text-left p-3 hover:bg-blue-50 rounded-lg border border-gray-200 transition-colors"
+                >
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900 text-sm">{result.label}</div>
+                      <div className="text-xs text-gray-500">
+                        {result.lat.toFixed(4)}, {result.lng.toFixed(4)}
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {searchQuery.trim().length >= 2 && !searching && searchResults.length === 0 && (
+            <div className="mt-3 text-center text-sm text-gray-500">
+              No results found. Try a different search term.
+            </div>
+          )}
+
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <button
+              onClick={handleManualSelection}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+              </svg>
+              Or click on map to select custom location
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Map Container */}
       <div className="rounded-lg overflow-hidden border-2 border-gray-200 shadow-lg">
         <MapContainer
@@ -286,6 +477,8 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          
+          {flyToCoords && <FlyToLocation lat={flyToCoords.lat} lng={flyToCoords.lng} />}
           
           <MapClickHandler onMapClick={handleMapClick} />
 
@@ -456,6 +649,16 @@ export default function TripMap({ onLocationsChange }: TripMapProps) {
                         <span>Use My Current Location (GPS)</span>
                       </>
                     )}
+                  </button>
+
+                  <button
+                    onClick={handleSearchSelection}
+                    className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <span>Search Location</span>
                   </button>
 
                   <button
